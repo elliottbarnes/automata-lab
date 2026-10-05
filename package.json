@@ -1,0 +1,15 @@
+{
+  "name": "automata-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "An inspectable regular expression compiler: Thompson NFA, subset DFA, minimal DFA.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 4175 --directory docs"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  }
+}

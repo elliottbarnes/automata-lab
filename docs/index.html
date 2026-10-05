@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Compile a regular expression into an NFA, a DFA, and a minimal DFA. Step through the machines and inspect every transition.">
+  <meta name="theme-color" content="#101411"><title>Automata Lab — watch a regex become a machine</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23101411'/%3E%3Ccircle cx='32' cy='32' r='19' stroke='%23c6f28e' stroke-width='4' fill='none'/%3E%3Ccircle cx='32' cy='32' r='13' stroke='%23c6f28e' stroke-width='2' fill='none'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css"><script type="module" src="app.js"></script>
+</head>
+<body>
+<div class="shell">
+  <header class="masthead"><a class="brand" href="./" aria-label="Automata Lab home"><span class="brand-icon" aria-hidden="true">◎</span> automata<span class="brand-light">/lab</span></a><div class="header-right"><span class="status-dot"></span><span class="local-label">RUNS IN YOUR BROWSER</span><a href="https://github.com/elliottbarnes/automata-lab" target="_blank" rel="noreferrer">Source ↗</a></div></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">FINITE MACHINES. INFINITE POSSIBILITIES.</p><h1>A regex, <span>under the hood.</span></h1><p class="lede">Build it. Reduce it. Follow every transition.</p></div><div class="version-label">THOMPSON → SUBSET → MINIMAL<br><span>AN INTERACTIVE COMPILER EXPLORER</span></div></section>
+    <div class="workbench">
+      <aside class="controls panel">
+        <form id="compile-form"><label class="field-label" for="pattern"><span>01 / EXPRESSION</span><span id="pattern-count">10 / 256</span></label><div class="expression-field"><span aria-hidden="true">/</span><input id="pattern" name="pattern" value="(a|b)*abb" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="257" aria-describedby="syntax-hint"><span aria-hidden="true">/</span></div><p class="hint" id="syntax-hint">Full-string matching · printable ASCII</p><div class="examples" aria-label="Example patterns"><button type="button" data-example="suffix" class="example active">Suffix</button><button type="button" data-example="identifier" class="example">Identifier</button><button type="button" data-example="email" class="example">Email shape</button></div><button class="compile-button" id="compile-button" type="submit">Compile expression <span aria-hidden="true">↗</span></button></form>
+        <div id="compile-error" class="error" role="alert" hidden></div>
+        <div class="control-divider"></div>
+        <label class="field-label" for="test-input">02 / TEST STRING</label><input id="test-input" class="test-input" value="aabb" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="513" aria-describedby="input-hint"><p class="hint" id="input-hint">Try a string, then walk through the machine.</p><div id="input-error" class="error" role="alert" hidden></div>
+        <div class="verdict" id="verdict" role="status"><span class="verdict-icon">✓</span><div><strong>Accepted</strong><small>The complete string matches.</small></div></div>
+        <div class="trace-controls"><button id="reset" type="button" aria-label="Reset to start">↺</button><button id="back" type="button" aria-label="Previous character">←</button><button id="step" type="button">Step →</button><button id="finish" type="button" aria-label="Jump to result">⇥</button></div>
+        <div class="tape" id="tape" aria-label="Input trace"></div><p class="trace-caption" id="trace-caption" aria-live="polite"></p>
+        <details class="syntax"><summary>Language & limits <span>+</span></summary><div><p><code>ab</code> concatenation · <code>a|b</code> choice · <code>(ab)</code> grouping</p><p><code>a*</code> zero or more · <code>a+</code> one or more · <code>a?</code> optional</p><p><code>.</code> any printable ASCII character · <code>[a-z]</code> class · <code>[^a]</code> complement</p><p>Escape punctuation with <code>\</code>. Empty patterns and empty alternatives match the empty string.</p><p>Alphabet: 95 characters, space through <code>~</code>. No Unicode, flags, anchors, lookaround, backreferences, <code>\d</code>, or counted repetition.</p><p>256 pattern characters · 512 input characters · 512 NFA states · 128 DFA states · 2M compilation operations. Compilation runs in a cancellable worker.</p></div></details>
+      </aside>
+      <section class="explorer panel" aria-label="Automaton explorer">
+        <div class="stage-nav" role="tablist" aria-label="Compilation stage"><button role="tab" aria-selected="false" aria-controls="machine-panel" id="tab-nfa" data-stage="nfa"><span>01</span> NFA</button><span class="stage-arrow" aria-hidden="true">→</span><button role="tab" aria-selected="false" aria-controls="machine-panel" id="tab-dfa" data-stage="dfa"><span>02</span> DFA</button><span class="stage-arrow" aria-hidden="true">→</span><button role="tab" aria-selected="true" aria-controls="machine-panel" id="tab-min" data-stage="min"><span>03</span> Minimal DFA</button></div>
+        <div id="machine-panel" role="tabpanel" aria-labelledby="tab-min">
+          <div class="machine-heading"><div><h2 id="stage-title">The smallest equivalent machine.</h2><p id="stage-description">States with identical future behavior become one.</p></div><span class="graph-badge" id="graph-badge">5 STATES</span></div>
+          <div class="diagram-wrap"><svg id="graph" viewBox="0 0 760 410" role="img" aria-labelledby="graph-title graph-description"><title id="graph-title">Finite automaton</title><desc id="graph-description">States and transitions. Use the state selector and transition table for the same information in text.</desc></svg><div class="diagram-legend"><span><i class="legend-active"></i>active</span><span><i class="legend-accept"></i>accepting</span><span>ε = no input consumed</span></div></div>
+          <p id="graph-notice" class="graph-notice" hidden></p>
+          <div class="metrics"><div><span>NFA STATES</span><strong id="nfa-count">—</strong></div><div><span>DFA STATES</span><strong id="dfa-count">—</strong></div><div><span>MINIMAL STATES</span><strong id="min-count">—</strong></div><div><span>COMPILER WORK</span><strong id="operation-count">—</strong></div></div>
+          <div class="inspection"><div class="inspection-heading"><h3>Inspect a state</h3><label for="state-select" class="sr-only">State to inspect</label><select id="state-select"></select><span id="state-status"></span></div><p class="state-origin" id="state-origin"></p><div class="table-scroll"><table><caption class="sr-only">Outgoing transitions for the selected state</caption><thead><tr><th>ON INPUT</th><th>GO TO</th><th>CHARACTERS</th></tr></thead><tbody id="transitions"></tbody></table></div></div>
+        </div>
+        <div class="build-status" id="build-status" role="status">Compiling…</div>
+      </section>
+    </div>
+    <section class="explanation"><div><span>01 / THOMPSON CONSTRUCTION</span><h3>Compose little machines.</h3><p>Each syntax node becomes a fragment. Epsilon transitions connect them into a nondeterministic automaton.</p></div><div><span>02 / SUBSET CONSTRUCTION</span><h3>Make every move certain.</h3><p>Each DFA state represents a set of NFA states. Every character has exactly one destination, including a dead state when needed.</p></div><div><span>03 / PARTITION REFINEMENT</span><h3>Keep only real distinctions.</h3><p>Repeatedly split states with different futures. Equivalent states merge without changing the language the machine accepts.</p></div></section>
+  </main>
+  <footer><span>Built by Elliott Barnes</span><span>Plain JavaScript. Actual automata. No regex engine shortcuts.</span><a href="https://github.com/elliottbarnes/automata-lab#how-it-works" target="_blank" rel="noreferrer">Read the implementation ↗</a></footer>
+</div>
+</body>
+</html>
