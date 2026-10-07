@@ -6,6 +6,7 @@
   "description": "An inspectable regular expression compiler: Thompson NFA, subset DFA, minimal DFA.",
   "scripts": {
     "test": "node --test",
+    "research": "node scripts/research/run.mjs",
     "serve": "python3 -m http.server 4175 --directory docs"
   },
   "license": "MIT",
